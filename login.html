@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Login</title>
+  <style>
+    :root{
+      --bg1:#6a11cb; --bg2:#2575fc;
+      --card:#ffffff; --muted:#6b7280; --accent:#2563eb;
+      --input-bg:#f8fafc; --danger:#dc2626;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:linear-gradient(135deg,var(--bg1),var(--bg2));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      color:#0f172a;
+    }
+    .card{
+      width:100%;
+      max-width:420px;
+      background:var(--card);
+      border-radius:12px;
+      padding:28px;
+      box-shadow:0 10px 30px rgba(2,6,23,0.2);
+    }
+    h1{margin:0 0 6px;font-size:20px}
+    p.lead{margin:0 0 18px;color:var(--muted);font-size:14px}
+    form .field{margin-bottom:14px}
+    label{display:block;font-size:13px;margin-bottom:6px}
+    input[type="email"],
+    input[type="password"]{
+      width:100%;
+      padding:12px 14px;
+      border-radius:8px;
+      border:1px solid #e6edf3;
+      background:var(--input-bg);
+      font-size:15px;
+      outline:none;
+      transition:box-shadow .15s, border-color .15s;
+    }
+    input:focus{box-shadow:0 0 0 4px rgba(37,99,235,0.08);border-color:var(--accent)}
+    .row{display:flex;gap:10px;align-items:center}
+    .flex{flex:1}
+    .actions{display:flex;align-items:center;justify-content:space-between;margin-top:6px}
+    .btn{
+      background:var(--accent);
+      color:white;
+      padding:10px 14px;
+      border-radius:8px;
+      border:0;
+      font-weight:600;
+      cursor:pointer;
+    }
+    .btn:active{transform:translateY(1px)}
+    .secondary{background:transparent;color:var(--accent);border:1px solid transparent;font-weight:600}
+    .remember{display:flex;gap:8px;align-items:center;color:var(--muted);font-size:14px}
+    .help{font-size:13px;color:var(--muted);margin-top:10px}
+    .error{color:var(--danger);font-size:13px;margin-top:6px}
+    .show-pass{font-size:13px;background:transparent;border:0;color:var(--accent);cursor:pointer}
+    @media (max-width:420px){ .card{padding:20px} }
+  </style>
+</head>
+<body>
+  <main class="card" role="main" aria-labelledby="login-title">
+    <h1 id="login-title">Sign in to your account</h1>
+    <p class="lead">Enter your email and password to continue.</p>
+
+    <form id="loginForm" novalidate>
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" inputmode="email" autocomplete="email" required
+               aria-describedby="emailHelp" placeholder="you@example.com">
+        <div id="emailHelp" class="help" aria-hidden="true">We'll never share your email.</div>
+        <div id="emailError" class="error" role="alert" aria-live="polite" style="display:none"></div>
+      </div>
+
+      <div class="field">
+        <div class="row" style="align-items:flex-end">
+          <div class="flex">
+            <label for="password">Password</label>
+            <input id="password" name="password" type="password" autocomplete="current-password" required
+                   minlength="6" placeholder="••••••••">
+            <div id="passwordError" class="error" role="alert" aria-live="polite" style="display:none"></div>
+          </div>
+          <div style="margin-top:22px">
+            <button type="button" id="togglePass" class="show-pass" aria-pressed="false" aria-controls="password">
+              Show
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <label class="remember">
+          <input type="checkbox" id="remember" name="remember" />
+          Remember me
+        </label>
+        <a href="#" class="secondary" style="text-decoration:none;font-size:14px">Forgot?</a>
+      </div>
+
+      <div style="margin-top:18px;display:flex;gap:10px;align-items:center;">
+        <button class="btn" type="submit">Sign in</button>
+        <button type="button" class="secondary" onclick="demoFill()" title="Fill demo credentials">Use demo</button>
+      </div>
+
+      <div id="submitMsg" class="help" aria-live="polite" style="margin-top:12px"></div>
+    </form>
+  </main>
+
+  <script>
+    const form = document.getElementById('loginForm');
+    const email = document.getElementById('email');
+    const password = document.getElementById('password');
+    const emailError = document.getElementById('emailError');
+    const passwordError = document.getElementById('passwordError');
+    const submitMsg = document.getElementById('submitMsg');
+    const toggle = document.getElementById('togglePass');
+
+    toggle.addEventListener('click', () => {
+      const isHidden = password.type === 'password';
+      password.type = isHidden ? 'text' : 'password';
+      toggle.textContent = isHidden ? 'Hide' : 'Show';
+      toggle.setAttribute('aria-pressed', String(isHidden));
+    });
+
+    function clearErrors(){
+      emailError.style.display = 'none'; emailError.textContent = '';
+      passwordError.style.display = 'none'; passwordError.textContent = '';
+      submitMsg.textContent = '';
+    }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      clearErrors();
+      let ok = true;
+
+      // basic client-side checks (always re-check on server)
+      if (!email.value || !email.checkValidity()){
+        emailError.style.display = 'block';
+        emailError.textContent = 'Please enter a valid email address.';
+        ok = false;
+      }
+      if (!password.value || password.value.length < 6){
+        passwordError.style.display = 'block';
+        passwordError.textContent = 'Password must be at least 6 characters.';
+        ok = false;
+      }
+
+      if (!ok){
+        return;
+      }
+
+      // Demo behavior: replace with real form submission to your backend
+      submitMsg.textContent = 'Signing in...';
+
+      // Simulate server response
+      setTimeout(() => {
+        // This is a demo only: accept specific demo credentials
+        if (email.value === 'demo@example.com' && password.value === 'password') {
+          submitMsg.textContent = 'Signed in successfully (demo). Redirecting...';
+          // In a real app: window.location = '/dashboard';
+        } else {
+          submitMsg.textContent = '';
+          passwordError.style.display = 'block';
+          passwordError.textContent = 'Invalid email or password.';
+        }
+      }, 800);
+    });
+
+    function demoFill(){
+      email.value = 'demo@example.com';
+      password.value = 'password';
+      clearErrors();
+    }
+  </script>
+</body>
+</html>
